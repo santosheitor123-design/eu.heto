@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desperdício de Água — Consumo Consciente</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --bg:#0a1512;
+    --bg-alt:#0d1c18;
+    --card:#122622;
+    --card-light:#16302a;
+    --neon:#3ff0c0;
+    --neon-soft:rgba(63,240,192,0.14);
+    --neon-dim:rgba(63,240,192,0.45);
+    --warn:#ff6b6b;
+    --warn-soft:rgba(255,107,107,0.14);
+    --text:#eef7f3;
+    --muted:#93b0a8;
+    --muted-dim:#5f7f78;
+    --line:rgba(255,255,255,0.09);
+    --font-display:'Fraunces', serif;
+    --font-body:'Inter', sans-serif;
+    --font-accent:'Space Grotesk', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  a{color:var(--neon); text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img{max-width:100%; display:block;}
+  :focus-visible{outline:2px solid var(--neon); outline-offset:3px;}
+  ::selection{background:var(--neon-soft); color:var(--text);}
+
+  .container{max-width:1080px; margin:0 auto; padding:0 32px;}
+
+  /* ---------- scroll progress ---------- */
+  #scrollbar{
+    position:fixed; top:0; left:0; height:3px; width:0%;
+    background:linear-gradient(90deg, var(--neon), #7dfcd8);
+    z-index:300; transition:width .08s linear;
+  }
+
+  /* ---------- soft glow orbs (ambient, static-ish) ---------- */
+  .glow-orb{
+    position:absolute; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0;
+    opacity:.35;
+  }
+
+  /* =================== INTRO / COVER =================== */
+  .cover{
+    position:fixed; inset:0; z-index:200;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(ellipse 700px 500px at 20% 15%, rgba(63,240,192,0.10), transparent 60%),
+      radial-gradient(ellipse 600px 500px at 85% 85%, rgba(63,240,192,0.07), transparent 60%),
+      var(--bg);
+    transition:opacity .8s ease, visibility .8s ease;
+  }
+  .cover.hidden{opacity:0; visibility:hidden; pointer-events:none;}
+  .cover-inner{max-width:620px; text-align:center; padding:0 32px;}
+  .cover-eyebrow{
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.3em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:22px;
+  }
+  .cover-title{
+    font-family:var(--font-display); font-weight:600; font-size:clamp(2.4rem, 6vw, 3.8rem);
+    line-height:1.1; letter-spacing:-.01em;
+  }
+  .cover-title em{
+    font-family:var(--font-accent); font-style:normal; font-weight:700;
+    color:var(--neon); position:relative;
+    text-shadow:0 0 28px var(--neon-dim);
+  }
+  .cover-rule{width:64px; height:2px; background:var(--neon); margin:28px auto; box-shadow:0 0 12px var(--neon-dim);}
+  .cover-credits-label{
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.25em; text-transform:uppercase;
+    color:var(--muted-dim); margin-bottom:14px;
+  }
+  .cover-names{
+    display:flex; justify-content:center; flex-wrap:wrap; gap:6px 18px;
+    font-family:var(--font-display); font-size:1.15rem; color:var(--text); margin-bottom:40px;
+  }
+  .cover-names span:not(:last-child)::after{content:"·"; margin-left:18px; color:var(--muted-dim);}
+  .btn-enter{
+    font-family:var(--font-body); font-weight:600; font-size:.95rem;
+    color:var(--bg); background:var(--neon); border:none; padding:15px 38px;
+    border-radius:2px; transition:transform .25s ease, box-shadow .25s ease;
+    box-shadow:0 0 0 rgba(63,240,192,0);
+  }
+  .btn-enter:hover{transform:translateY(-2px); box-shadow:0 8px 30px rgba(63,240,192,0.35);}
+
+  /* =================== NAV =================== */
+  nav.site-nav{
+    position:sticky; top:3px; z-index:90;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 32px; background:rgba(10,21,18,0.75); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-brand{font-family:var(--font-display); font-size:1.05rem; font-weight:600;}
+  .nav-brand span{color:var(--neon);}
+  .nav-links{display:flex; gap:30px; font-size:.88rem; color:var(--muted);}
+  .nav-links a{color:var(--muted); position:relative; padding-bottom:3px;}
+  .nav-links a::after{
+    content:""; position:absolute; left:0; bottom:0; width:0; height:1px; background:var(--neon);
+    transition:width .25s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a:hover::after{width:100%;}
+  @media (max-width:720px){.nav-links{display:none;}}
+
+  /* =================== HERO =================== */
+  .hero{
+    position:relative; padding:120px 32px 100px; text-align:center; overflow:hidden;
+  }
+  .hero-eyebrow{
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.3em; text-transform:uppercase;
+    color:var(--neon); margin-bottom:22px; position:relative; z-index:1;
+  }
+  .hero h1{
+    font-family:var(--font-display); font-weight:600; font-size:clamp(2.2rem, 6vw, 4rem);
+    max-width:820px; margin:0 auto 26px; line-height:1.15; position:relative; z-index:1;
+  }
+  .hero h1 em{font-family:var(--font-accent); font-style:normal; font-weight:700; color:var(--neon); text-shadow:0 0 24px var(--neon-dim);}
+  .hero p{
+    max-width:560px; margin:0 auto; color:var(--muted); font-size:1.05rem; position:relative; z-index:1;
+  }
+  .hero-stats{
+    display:flex; justify-content:center; gap:50px; margin-top:56px; flex-wrap:wrap; position:relative; z-index:1;
+  }
+  .hero-stat b{
+    display:block; font-family:var(--font-display); font-size:2rem; color:var(--neon);
+  }
+  .hero-stat span{font-size:.8rem; color:var(--muted); letter-spacing:.03em;}
+
+  /* =================== CHAPTER (theme section) =================== */
+  .chapter{position:relative; padding:100px 32px; z-index:1;}
+  .chapter:nth-child(even){background:var(--bg-alt);}
+  .chapter-head{
+    display:flex; align-items:flex-start; gap:28px; max-width:920px; margin:0 auto 48px;
+  }
+  .chapter-num{
+    font-family:var(--font-display); font-size:4.5rem; font-weight:500; color:transparent;
+    -webkit-text-stroke:1.5px var(--neon-dim); line-height:1; flex-shrink:0;
+  }
+  .chapter-eyebrow{
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.25em; text-transform:uppercase;
+    color:var(--muted); display:block; margin-bottom:10px; margin-top:10px;
+  }
+  .chapter-head h2{
+    font-family:var(--font-display); font-weight:600; font-size:clamp(1.7rem, 4vw, 2.5rem);
+  }
+
+  .chapter-content{max-width:920px; margin:0 auto; display:grid; grid-template-columns:1fr 260px; gap:50px;}
+  @media (max-width:820px){.chapter-content{grid-template-columns:1fr;}}
+
+  .chapter-body p{color:var(--muted); margin-bottom:20px; font-size:1rem;}
+  .chapter-body p strong{
+    font-family:var(--font-accent); color:var(--text); font-weight:700;
+    letter-spacing:.005em;
+  }
+  .pull-fact{
+    border-left:2px solid var(--neon); padding:4px 0 4px 20px; margin:32px 0;
+    font-family:var(--font-accent); font-weight:600; font-size:1.1rem; color:var(--text);
+    letter-spacing:.005em;
+  }
+  .chapter-illustration{
+    position:sticky; top:100px; align-self:start;
+  }
+  .chapter-illustration svg{width:100%; height:auto;}
+
+  .subhead{
+    font-family:var(--font-display); font-weight:600; font-size:1.25rem; margin:36px 0 14px; color:var(--text);
+  }
+
+  /* =================== ACTIVITY CARDS =================== */
+  .activities-row{
+    max-width:920px; margin:56px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:24px;
+  }
+  @media (max-width:820px){.activities-row{grid-template-columns:1fr;}}
+
+  .activity-card{
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--neon);
+    padding:26px 26px 22px; position:relative;
+  }
+  .activity-eyebrow{
+    font-family:var(--font-mono); font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--neon); margin-bottom:8px;
+  }
+  .activity-title{
+    font-family:var(--font-display); font-size:1.15rem; font-weight:600; margin-bottom:6px;
+  }
+  .activity-hint{font-size:.82rem; color:var(--muted); margin-bottom:20px;}
+  .activity-stage{
+    min-height:170px; display:flex; align-items:center; justify-content:center; position:relative;
+    padding:10px 0;
+  }
+  .activity-footer{
+    display:flex; justify-content:space-between; align-items:baseline; margin-top:16px;
+    padding-top:14px; border-top:1px solid var(--line);
+    font-size:.82rem; color:var(--muted);
+  }
+  .activity-footer .val{font-family:var(--font-mono); color:var(--warn); font-weight:600;}
+  .activity-footer .val.ok{color:var(--neon);}
+  .activity-msg{font-size:.8rem; color:var(--muted); margin-top:10px; min-height:1.2em;}
+  .activity-msg.ok{color:var(--neon);}
+  .activity-msg.warn{color:var(--warn);}
+
+  /* ---- generic buttons within activities ---- */
+  .btn-ghost{
+    font-family:var(--font-body); font-weight:600; font-size:.82rem;
+    background:transparent; border:1px solid var(--neon); color:var(--neon);
+    padding:9px 18px; transition:.2s; border-radius:2px;
+  }
+  .btn-ghost:hover{background:var(--neon-soft);}
+  .btn-ghost:disabled{opacity:.3; cursor:not-allowed;}
+
+  /* ---- faucet valve (drag to close) ---- */
+  .faucet-rig{position:relative; width:200px; height:170px;}
+  .valve-wheel{cursor:grab; touch-action:none; position:absolute; left:6px; top:4px;}
+  .valve-wheel:active{cursor:grabbing;}
+  .drop{animation:drip 1.1s infinite;}
+  @keyframes drip{
+    0%{transform:translateY(0); opacity:1;}
+    75%{transform:translateY(34px); opacity:.25;}
+    100%{transform:translateY(36px); opacity:0;}
+  }
+  .faucet-rig.closed .drop{display:none;}
+
+  /* ---- pipe leaks ---- */
+  .leak-spot{cursor:pointer;}
+  .leak-spray{animation:spray .8s infinite ease-in-out; transform-origin:center;}
+  @keyframes spray{0%{opacity:.85;} 50%{opacity:.35;} 100%{opacity:.85;}}
+  .leak-spot.patched .leak-spray{display:none;}
+  .leak-spot.patched .leak-patch{display:block;}
+  .leak-patch{display:none;}
+
+  /* ---- phase stepper (car wash / dishes) ---- */
+  .phase-rig{width:100%; text-align:center;}
+  .phase-label{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px;}
+  .phase-steps{display:flex; justify-content:center; gap:8px; margin-bottom:18px;}
+  .phase-dot{width:7px; height:7px; border-radius:50%; background:var(--line); border:1px solid var(--muted-dim);}
+  .phase-dot.active{background:var(--neon); border-color:var(--neon);}
+  .phase-dot.done{background:var(--muted-dim); border-color:var(--muted-dim);}
+
+  .hose-toggle{
+    display:inline-flex; align-items:center; gap:10px; margin:14px 0; user-select:none;
+  }
+  .toggle-track{
+    width:44px; height:24px; border-radius:20px; background:var(--card-light); border:1px solid var(--line);
+    position:relative; transition:.25s;
+  }
+  .toggle-track.on{background:var(--neon-soft); border-color:var(--neon);}
+  .toggle-knob{
+    position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%;
+    background:var(--muted-dim); transition:.25s;
+  }
+  .toggle-track.on .toggle-knob{transform:translateX(20px); background:var(--neon);}
+  .toggle-label{font-size:.8rem; color:var(--muted);}
+
+  .row-buttons{display:flex; justify-content:center; gap:10px; margin-top:14px;}
+
+  /* ---- tank ---- */
+  .tank-rig{display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .tank-box{position:relative; width:88px; height:140px; border:1.5px solid var(--muted-dim); border-radius:3px; overflow:hidden;}
+  .tank-danger-zone{position:absolute; left:0; right:0; top:0; height:22%; background:repeating-linear-gradient(45deg, rgba(255,107,107,0.10) 0 6px, transparent 6px 12px); opacity:0; transition:opacity .3s;}
+  .tank-box.danger .tank-danger-zone{opacity:1;}
+  .tank-box.overflow{animation:shake .35s;}
+  @keyframes shake{0%,100%{transform:translateX(0);} 30%{transform:translateX(-3px);} 70%{transform:translateX(3px);}}
+
+  /* ---- shower ---- */
+  .shower-rig{display:flex; flex-direction:column; align-items:center;}
+  .shower-stream{animation:fall .55s infinite linear;}
+  @keyframes fall{0%{transform:translateY(0); opacity:1;} 100%{transform:translateY(16px); opacity:0;}}
+  .shower-rig.off .shower-stream{display:none;}
+
+  /* =================== RESULTS / SUMMARY =================== */
+  .summary{padding:110px 32px; text-align:center; position:relative;}
+  .summary-eyebrow{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.25em; text-transform:uppercase; color:var(--neon);}
+  .summary-number{
+    font-family:var(--font-display); font-size:clamp(2.6rem, 8vw, 4.5rem); margin:18px 0;
+    color:var(--text);
+  }
+  .summary-number span{color:var(--neon); text-shadow:0 0 30px var(--neon-dim);}
+  .summary-equiv{color:var(--muted); max-width:520px; margin:0 auto; font-size:1rem;}
+  .summary-bar{
+    max-width:420px; margin:40px auto 0; height:6px; background:var(--card); border-radius:4px; overflow:hidden;
+  }
+  .summary-bar-fill{
+    height:100%; width:0%; background:linear-gradient(90deg, var(--neon), #7dfcd8);
+    transition:width 1.2s ease;
+  }
+  .summary-bar-label{font-family:var(--font-mono); font-size:.75rem; color:var(--muted); margin-top:10px;}
+
+  /* =================== TIPS =================== */
+  .tips{padding:0 32px 110px; max-width:760px; margin:0 auto;}
+  .tips h3{font-family:var(--font-display); font-size:1.5rem; margin-bottom:8px; text-align:center;}
+  .tips p.lead{text-align:center; color:var(--muted); margin-bottom:40px; font-size:.95rem;}
+  .tip-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+  .tip-item{
+    display:flex; align-items:center; gap:16px; padding:18px 20px; background:var(--card);
+    border:1px solid var(--line); cursor:pointer; transition:background .2s;
+  }
+  .tip-item:hover{background:var(--card-light);}
+  .tip-check{width:20px; height:20px; border:1.5px solid var(--neon); flex-shrink:0; position:relative; border-radius:3px;}
+  .tip-item.done .tip-check{background:var(--neon);}
+  .tip-item.done .tip-check::after{content:"✓"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.7rem; color:var(--bg); font-weight:700;}
+  .tip-item.done .tip-text{color:var(--muted); text-decoration:line-through;}
+  .tip-counter{text-align:right; margin-top:16px; font-family:var(--font-mono); font-size:.78rem; color:var(--muted);}
+
+  /* =================== FLOATING COUNTER =================== */
+  .float-counter{
+    position:fixed; bottom:22px; right:22px; z-index:150;
+    background:rgba(18,38,34,0.9); backdrop-filter:blur(8px); border:1px solid var(--line);
+    border-left:2px solid var(--neon); padding:12px 18px; font-size:.78rem; color:var(--muted);
+    transition:transform .3s ease; opacity:0; transform:translateY(10px);
+  }
+  .float-counter.show{opacity:1; transform:translateY(0);}
+  .float-counter b{font-family:var(--font-mono); color:var(--neon); font-size:.95rem; display:block; margin-top:2px;}
+  @media (max-width:600px){.float-counter{left:16px; right:16px; bottom:16px;}}
+
+  /* =================== FOOTER =================== */
+  footer{padding:60px 32px; text-align:center; border-top:1px solid var(--line);}
+  footer .f-brand{font-family:var(--font-display); font-size:1.2rem; margin-bottom:10px;}
+  footer .f-brand span{color:var(--neon);}
+  footer .f-names{font-family:var(--font-mono); font-size:.85rem; color:var(--muted); margin-bottom:6px;}
+  footer .f-note{font-size:.78rem; color:var(--muted-dim);}
+
+  /* =================== SCROLL REVEAL =================== */
+  .reveal{opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="scrollbar"></div>
+
+<!-- =================== COVER =================== -->
+<div class="cover" id="cover">
+  <div class="cover-inner">
+    <div class="cover-eyebrow">Projeto Escolar</div>
+    <h1 class="cover-title">Desperdício <em>de Água</em></h1>
+    <div class="cover-rule"></div>
+    <div class="cover-credits-label">Créditos da turma</div>
+    <div class="cover-names">
+      <span>Heto</span><span>Dino</span><span>Jão</span><span>Vini</span>
+    </div>
+    <button class="btn-enter" id="btnEnter">Começar leitura</button>
+  </div>
+</div>
+
+<!-- =================== NAV =================== -->
+<nav class="site-nav">
+  <div class="nav-brand">Desperdício <span>de Água</span></div>
+  <div class="nav-links">
+    <a href="#torneiras">Torneiras e Canos</a>
+    <a href="#limpeza">Limpeza</a>
+    <a href="#economizar">Falta de Economizar</a>
+    <a href="#conclusao">Conclusão</a>
+  </div>
+</nav>
+
+<!-- =================== HERO =================== -->
+<section class="hero">
+  <div class="glow-orb" style="width:420px; height:420px; background:var(--neon); top:-120px; left:-100px;"></div>
+  <div class="glow-orb" style="width:360px; height:360px; background:#1fa8ff; bottom:-140px; right:-80px;"></div>
+  <div class="hero-eyebrow">Consumo consciente</div>
+  <h1>Cada gota conta antes de <em>virar hábito</em>.</h1>
+  <p>
+    A água tratada que chega até a nossa casa passa por um processo caro e demorado —
+    e boa parte dela se perde sem que a gente perceba: numa torneira mal fechada, numa
+    mangueira esquecida ligada, num banho que se estende sem necessidade. Este site reúne
+    três frentes onde o desperdício mais acontece, com atividades para praticar o que
+    fazer diferente.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat"><b>3</b><span>temas explorados</span></div>
+    <div class="hero-stat"><b>6</b><span>atividades práticas</span></div>
+    <div class="hero-stat"><b>&lt;1%</b><span>água doce acessível no planeta</span></div>
+  </div>
+</section>
+
+<!-- =================== CHAPTER 01 — TORNEIRAS E CANOS =================== -->
+<section class="chapter" id="torneiras">
+  <div class="container">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">01</span>
+      <div>
+        <span class="chapter-eyebrow">Capítulo 01</span>
+        <h2>Torneiras e Canos</h2>
+      </div>
+    </div>
+
+    <div class="chapter-content">
+      <div class="chapter-body reveal">
+        <p>
+          É o tipo de desperdício mais silencioso que existe. Uma torneira que pinga não
+          faz barulho suficiente para incomodar, não aparece na conta do mês seguinte com
+          clareza, e por isso é fácil deixar "para depois". O problema é que a água não
+          espera: <strong>um gotejamento constante pode significar dezenas de litros perdidos
+          por dia</strong>, mesmo sem ninguém usando a torneira.
+        </p>
+        <p>
+          O mesmo vale para os canos. A maioria dos vazamentos de tubulação não acontece
+          de forma visível — eles começam como uma pequena rachadura na junta, um anel de
+          vedação desgastado pelo tempo, ou uma solda que perdeu a firmeza depois de anos
+          de uso. Em prédios mais antigos, é comum existir um vazamento correndo dentro da
+          parede ou embaixo do piso por meses até que alguém note uma mancha de umidade ou
+          um consumo estranhamente alto.
+        </p>
+        <div class="pull-fact">"O que não se vê, não se conserta — e é exatamente por isso que os vazamentos de cano são os mais caros."</div>
+        <p>
+          A boa notícia é que a maior parte desses problemas tem solução simples e barata:
+          trocar uma borracha de vedação, apertar uma conexão, chamar um encanador ao primeiro
+          sinal de umidade. O primeiro passo é treinar o olho — e a atenção — para não deixar
+          o pequeno vazamento se tornar rotina.
+        </p>
+        <div class="subhead">Como identificar um vazamento escondido</div>
+        <p>
+          Uma forma simples de verificar se existe um vazamento não identificado em casa é
+          fechar todas as torneiras e não usar nenhum aparelho que consuma água por algumas
+          horas — à noite, por exemplo. Se o hidrômetro continuar girando mesmo assim, há
+          uma boa chance de existir um vazamento em algum ponto da tubulação.
+        </p>
+      </div>
+
+      <div class="chapter-illustration reveal">
+        <svg viewBox="0 0 240 320" fill="none">
+          <rect x="60" y="10" width="26" height="60" rx="4" stroke="#3ff0c0" stroke-width="2" opacity=".5"/>
+          <rect x="55" y="66" width="90" height="20" rx="8" stroke="#3ff0c0" stroke-width="2" opacity=".5"/>
+          <line x1="145" y1="86" x2="145" y2="112" stroke="#3ff0c0" stroke-width="2" opacity=".5"/>
+          <path d="M145 114 q7 12 0 20 q-7 -8 0 -20 Z" fill="#3ff0c0" opacity=".6"/>
+          <path d="M145 150 q7 12 0 20 q-7 -8 0 -20 Z" fill="#3ff0c0" opacity=".35"/>
+          <line x1="20" y1="220" x2="220" y2="220" stroke="#3ff0c0" stroke-width="2" opacity=".35"/>
+          <circle cx="90" cy="220" r="6" stroke="#ff6b6b" stroke-width="1.5" fill="none" opacity=".7"/>
+          <line x1="87" y1="226" x2="82" y2="240" stroke="#3ff0c0" stroke-width="1.5" opacity=".4"/>
+          <line x1="93" y1="226" x2="98" y2="240" stroke="#3ff0c0" stroke-width="1.5" opacity=".4"/>
+          <circle cx="160" cy="220" r="6" stroke="#ff6b6b" stroke-width="1.5" fill="none" opacity=".7"/>
+          <line x1="157" y1="226" x2="152" y2="240" stroke="#3ff0c0" stroke-width="1.5" opacity=".4"/>
+          <line x1="163" y1="226" x2="168" y2="240" stroke="#3ff0c0" stroke-width="1.5" opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="activities-row">
+      <!-- ACTIVITY: FAUCET -->
+      <div class="activity-card reveal" id="cardFaucet">
+        <div class="activity-eyebrow">Atividade interativa</div>
+        <div class="activity-title">Feche o registro</div>
+        <div class="activity-hint">Clique e arraste o volante em círculo até fechar completamente a torneira.</div>
+        <div class="activity-stage">
+          <div class="faucet-rig" id="faucetRig">
+            <svg width="120" height="130" viewBox="0 0 120 130" style="position:absolute; right:6px; top:0;">
+              <rect x="50" y="0" width="20" height="30" fill="none" stroke="#3ff0c0" stroke-width="2"/>
+              <rect x="50" y="30" width="50" height="14" rx="4" fill="none" stroke="#3ff0c0" stroke-width="2"/>
+              <line x1="100" y1="44" x2="100" y2="58" stroke="#3ff0c0" stroke-width="2"/>
+              <g id="dropGroup">
+                <path class="drop" d="M100 60 q6 10 0 16 q-6 -6 0 -16 Z" fill="#3ff0c0" style="animation-delay:0s"/>
+                <path class="drop" d="M100 60 q6 10 0 16 q-6 -6 0 -16 Z" fill="#3ff0c0" style="animation-delay:.36s"/>
+                <path class="drop" d="M100 60 q6 10 0 16 q-6 -6 0 -16 Z" fill="#3ff0c0" style="animation-delay:.72s"/>
+              </g>
+            </svg>
+            <svg class="valve-wheel" id="valveWheel" width="72" height="72" viewBox="0 0 72 72" style="transform:rotate(0deg);">
+              <circle cx="36" cy="36" r="24" fill="#122622" stroke="#3ff0c0" stroke-width="3"/>
+              <line x1="36" y1="14" x2="36" y2="58" stroke="#3ff0c0" stroke-width="3"/>
+              <line x1="14" y1="36" x2="58" y2="36" stroke="#3ff0c0" stroke-width="3"/>
+              <circle cx="36" cy="36" r="4" fill="#3ff0c0"/>
+            </svg>
+          </div>
+        </div>
+        <div class="activity-footer">
+          <span>vazamento estimado</span>
+          <span class="val" id="faucetValue">46 L/dia</span>
+        </div>
+        <div class="activity-msg" id="faucetMsg"></div>
+      </div>
+
+      <!-- ACTIVITY: PIPE -->
+      <div class="activity-card reveal" id="cardPipe">
+        <div class="activity-eyebrow">Atividade interativa</div>
+        <div class="activity-title">Vede os furos do cano</div>
+        <div class="activity-hint">Clique em cada ponto de vazamento para aplicar uma vedação.</div>
+        <div class="activity-stage">
+          <svg width="230" height="90" viewBox="0 0 230 90">
+            <rect x="5" y="34" width="220" height="26" rx="10" fill="none" stroke="#3ff0c0" stroke-width="2"/>
+            <g class="leak-spot" data-leak="1">
+              <circle cx="60" cy="60" r="7" fill="#122622" stroke="#ff6b6b" stroke-width="2"/>
+              <g class="leak-spray">
+                <line x1="57" y1="66" x2="50" y2="80" stroke="#3ff0c0" stroke-width="2"/>
+                <line x1="63" y1="66" x2="70" y2="80" stroke="#3ff0c0" stroke-width="2"/>
+              </g>
+              <rect class="leak-patch" x="48" y="52" width="24" height="16" rx="2" fill="#3ff0c0" transform="rotate(-3 60 60)"/>
+            </g>
+            <g class="leak-spot" data-leak="2">
+              <circle cx="115" cy="34" r="7" fill="#122622" stroke="#ff6b6b" stroke-width="2"/>
+              <g class="leak-spray">
+                <line x1="112" y1="28" x2="105" y2="12" stroke="#3ff0c0" stroke-width="2"/>
+                <line x1="118" y1="28" x2="125" y2="12" stroke="#3ff0c0" stroke-width="2"/>
+              </g>
+              <rect class="leak-patch" x="103" y="18" width="24" height="16" rx="2" fill="#3ff0c0" transform="rotate(2 115 34)"/>
+            </g>
+            <g class="leak-spot" data-leak="3">
+              <circle cx="170" cy="60" r="7" fill="#122622" stroke="#ff6b6b" stroke-width="2"/>
+              <g class="leak-spray">
+                <line x1="167" y1="66" x2="160" y2="80" stroke="#3ff0c0" stroke-width="2"/>
+                <line x1="173" y1="66" x2="180" y2="80" stroke="#3ff0c0" stroke-width="2"/>
+              </g>
+              <rect class="leak-patch" x="158" y="52" width="24" height="16" rx="2" fill="#3ff0c0" transform="rotate(-2 170 60)"/>
+            </g>
+          </svg>
+        </div>
+        <div class="activity-footer">
+          <span>furos ativos</span>
+          <span class="val" id="pipeValue">3 pontos</span>
+        </div>
+        <div class="activity-msg" id="pipeMsg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== CHAPTER 02 — LIMPEZA =================== -->
+<section class="chapter" id="limpeza">
+  <div class="container">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">02</span>
+      <div>
+        <span class="chapter-eyebrow">Capítulo 02</span>
+        <h2>Limpeza</h2>
+      </div>
+    </div>
+
+    <div class="chapter-content">
+      <div class="chapter-body reveal">
+        <p>
+          Limpar a casa, lavar a louça, dar uma mangueirada na calçada ou lavar o carro no
+          fim de semana — são tarefas comuns, quase automáticas, e é justamente por isso
+          que costumam esconder um desperdício enorme. A torneira ou a mangueira ficam
+          ligadas o tempo inteiro, mesmo durante as etapas em que a água não está sendo
+          realmente usada, como quando estamos ensaboando ou esfregando.
+        </p>
+        <p>
+          Trocar a mangueira por uma vassoura para limpar calçadas e quintais, por exemplo,
+          é uma das mudanças de hábito com maior impacto: <strong>uma mangueira aberta por
+          10 minutos pode gastar mais água do que uma pessoa consome bebendo durante vários
+          dias</strong>. O mesmo raciocínio vale para lavar louça com a torneira correndo o
+          tempo todo, em vez de ensaboar com o registro fechado e enxaguar tudo de uma vez.
+        </p>
+        <div class="pull-fact">"A água que sai enquanto ensaboamos não limpa nada — só escoa."</div>
+        <p>
+          Pequenos ajustes de rotina — usar balde em vez de mangueira para lavar o carro,
+          fechar o registro entre uma etapa e outra, juntar louça suja para lavar de uma vez
+          — reduzem o consumo sem exigir nenhum equipamento novo ou gasto extra. É apenas
+          uma questão de reorganizar a sequência de gestos que já fazemos todo dia.
+        </p>
+        <div class="subhead">Duas etapas, dois hábitos</div>
+        <p>
+          As atividades abaixo simulam duas tarefas domésticas comuns. Em cada uma, o desafio
+          é o mesmo: manter a água fechada durante a etapa de esfregar ou ensaboar, e abrir
+          apenas na hora de enxaguar.
+        </p>
+      </div>
+
+      <div class="chapter-illustration reveal">
+        <svg viewBox="0 0 240 320" fill="none">
+          <rect x="70" y="40" width="100" height="60" rx="6" stroke="#3ff0c0" stroke-width="2" opacity=".5"/>
+          <path d="M70 100 q50 20 100 0" stroke="#3ff0c0" stroke-width="2" opacity=".3" fill="none"/>
+          <circle cx="120" cy="150" r="34" stroke="#3ff0c0" stroke-width="2" opacity=".4" fill="none"/>
+          <path d="M105 150 l10 10 l20 -20" stroke="#3ff0c0" stroke-width="2.5" opacity=".7" fill="none"/>
+          <line x1="60" y1="220" x2="180" y2="220" stroke="#3ff0c0" stroke-width="2" opacity=".3"/>
+          <path d="M100 220 q5 12 0 22" stroke="#3ff0c0" stroke-width="1.5" opacity=".4"/>
+          <path d="M140 220 q5 12 0 22" stroke="#3ff0c0" stroke-width="1.5" opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="activities-row">
+      <!-- ACTIVITY: CAR WASH -->
+      <div class="activity-card reveal" id="cardCar">
+        <div class="activity-eyebrow">Atividade interativa</div>
+        <div class="activity-title">Lavagem consciente do carro</div>
+        <div class="activity-hint">Avance pelas etapas mantendo a mangueira fechada enquanto ensaboa.</div>
+        <div class="activity-stage">
+          <div class="phase-rig">
+            <div class="phase-label" id="carPhaseLabel">Etapa 1 de 3 — Molhar</div>
+            <div class="phase-steps">
+              <span class="phase-dot active" data-i="0"></span>
+              <span class="phase-dot" data-i="1"></span>
+              <span class="phase-dot" data-i="2"></span>
+            </div>
+            <div class="hose-toggle">
+              <span class="toggle-label">Mangueira</span>
+              <div class="toggle-track" id="carHoseToggle"><div class="toggle-knob"></div></div>
+              <span class="toggle-label" id="carHoseState">fechada</span>
+            </div>
+            <div class="row-buttons">
+              <button class="btn-ghost" id="carNextBtn">Avançar etapa</button>
+            </div>
+          </div>
+        </div>
+        <div class="activity-footer">
+          <span>água desperdiçada</span>
+          <span class="val" id="carValue">0 L</span>
+        </div>
+        <div class="activity-msg" id="carMsg"></div>
+      </div>
+
+      <!-- ACTIVITY: DISHES -->
+      <div class="activity-card reveal" id="cardDishes">
+        <div class="activity-eyebrow">Atividade interativa</div>
+        <div class="activity-title">Lavagem consciente da louça</div>
+        <div class="activity-hint">Feche a torneira para esfregar e abra apenas para enxaguar.</div>
+        <div class="activity-stage">
+          <div class="phase-rig">
+            <div class="phase-label" id="dishPhaseLabel">Etapa 1 de 2 — Esfregar</div>
+            <div class="phase-steps">
+              <span class="phase-dot active" data-i="0"></span>
+              <span class="phase-dot" data-i="1"></span>
+            </div>
+            <div class="hose-toggle">
+              <span class="toggle-label">Torneira</span>
+              <div class="toggle-track" id="dishTapToggle"><div class="toggle-knob"></div></div>
+              <span class="toggle-label" id="dishTapState">fechada</span>
+            </div>
+            <div class="row-buttons">
+              <button class="btn-ghost" id="dishNextBtn">Avançar etapa</button>
+            </div>
+          </div>
+        </div>
+        <div class="activity-footer">
+          <span>água desperdiçada</span>
+          <span class="val" id="dishValue">0 L</span>
+        </div>
+        <div class="activity-msg" id="dishMsg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== CHAPTER 03 — FALTA DE ECONOMIZAR =================== -->
+<section class="chapter" id="economizar">
+  <div class="container">
+    <div class="chapter-head reveal">
+      <span class="chapter-num">03</span>
+      <div>
+        <span class="chapter-eyebrow">Capítulo 03</span>
+        <h2>Falta de Economizar</h2>
+      </div>
+    </div>
+
+    <div class="chapter-content">
+      <div class="chapter-body reveal">
+        <p>
+          Diferente dos vazamentos, esse tipo de desperdício não vem de um problema técnico
+          — vem da falta de atenção. É o banho que se estende porque o rádio tocou uma
+          música boa, é o reservatório que enche e ninguém está por perto para fechar o
+          registro a tempo, é aquele "depois eu fecho" que nunca acontece.
+        </p>
+        <p>
+          A água, ao contrário da conta de luz, é quase invisível no dia a dia: ela chega
+          sempre que abrimos a torneira, sem esforço aparente, e isso faz com que seja fácil
+          esquecer que existe um limite real por trás dela. <strong>Reduzir o banho de 15
+          para 8 minutos, por exemplo, pode representar quase metade do consumo</strong>
+          — sem exigir nenhuma mudança de conforto real, apenas um pouco mais de atenção ao
+          tempo.
+        </p>
+        <div class="pull-fact">"A gente só valoriza a água de verdade quando ela falta."</div>
+        <p>
+          O mesmo vale para reservatórios e caixas d'água: sem um extravasor bem ajustado ou
+          um automático de nível, é fácil perder de vista o quanto a caixa já encheu — e
+          descobrir o desperdício só quando a água já está escorrendo pela rua. Criar o
+          hábito de checar o nível, e não confiar apenas na memória, evita que litros e mais
+          litros sejam perdidos por simples esquecimento.
+        </p>
+      </div>
+
+      <div class="chapter-illustration reveal">
+        <svg viewBox="0 0 240 320" fill="none">
+          <rect x="80" y="30" width="80" height="130" rx="4" stroke="#3ff0c0" stroke-width="2" opacity=".5"/>
+          <rect x="83" y="120" width="74" height="37" fill="#3ff0c0" opacity=".18"/>
+          <line x1="60" y1="200" x2="180" y2="200" stroke="#3ff0c0" stroke-width="2" opacity=".3"/>
+          <path d="M100 200 v18" stroke="#3ff0c0" stroke-width="1.5" opacity=".45"/>
+          <path d="M120 200 v18" stroke="#3ff0c0" stroke-width="1.5" opacity=".45"/>
+          <path d="M140 200 v18" stroke="#3ff0c0" stroke-width="1.5" opacity=".45"/>
+          <circle cx="120" cy="260" r="26" stroke="#ff6b6b" stroke-width="1.5" opacity=".5" fill="none"/>
+          <path d="M110 260 h20 M120 250 v20" stroke="#ff6b6b" stroke-width="1.5" opacity=".5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="activities-row">
+      <!-- ACTIVITY: SHOWER -->
+      <div class="activity-card reveal" id="cardShower">
+        <div class="activity-eyebrow">Atividade interativa</div>
+        <div class="activity-title">Chuveiro consciente</div>
+        <div class="activity-hint">O contador sobe a cada segundo. Desligue assim que possível.</div>
+        <div class="activity-stage">
+          <div class="shower-rig" id="showerRig">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <line x1="20" y1="16" x2="100" y2="16" stroke="#3ff0c0" stroke-width="2"/>
+              <line x1="60" y1="2" x2="60" y2="16" stroke="#3ff0c0" stroke-width="2"/>
+              <line class="shower-stream" x1="32" y1="20" x2="28" y2="46" stroke="#3ff0c0" stroke-width="2" style="animation-delay:0s"/>
+              <line class="shower-stream" x1="50" y1="20" x2="47" y2="50" stroke="#3ff0c0" stroke-width="2" style="animation-delay:.14s"/>
+              <line class="shower-stream" x1="68" y1="20" x2="68" y2="52" stroke="#3ff0c0" stroke-width="2" style="animation-delay:.28s"/>
+              <line class="shower-stream" x1="86" y1="20" x2="90" y2="48" stroke="#3ff0c0" stroke-width="2" style="animation-delay:.42s"/>
+            </svg>
+            <button class="btn-ghost" id="showerBtn">Desligar chuveiro</button>
+          </div>
+        </div>
+        <div class="activity-footer">
+          <span>consumo em tempo real</span>
+          <span class="val" id="showerValue">0 L</span>
+        </div>
+        <div class="activity-msg" id="showerMsg"></div>
+      </div>
+
+      <!-- ACTIVITY: TANK -->
+      <div class="activity-card reveal" id="cardTank">
+        <div class="activity-eyebrow">Atividade interativa</div>
+        <div class="activity-title">Reservatório sob controle</div>
+        <div class="activity-hint">O nível sobe sozinho. Feche o registro antes de transbordar.</div>
+        <div class="activity-stage">
+          <div class="tank-rig">
+            <div class="tank-box" id="tankBox">
+              <div class="tank-danger-zone"></div>
+              <svg id="tankWaterSvg" viewBox="0 0 88 140" style="position:absolute; inset:0; width:100%; height:100%;">
+                <path id="tankWavePath" d="" fill="#3ff0c0" opacity="0.55"></path>
+              </svg>
+            </div>
+            <button class="btn-ghost" id="tankBtn">Fechar registro</button>
+          </div>
+        </div>
+        <div class="activity-footer">
+          <span>nível do reservatório</span>
+          <span class="val" id="tankValue">15%</span>
+        </div>
+        <div class="activity-msg" id="tankMsg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== SUMMARY =================== -->
+<section class="summary">
+  <div class="glow-orb" style="width:400px; height:400px; background:var(--neon); top:20%; left:50%; transform:translateX(-50%);"></div>
+  <div class="summary-eyebrow reveal">Resultado da sua visita</div>
+  <div class="summary-number reveal">Você conteve <span id="summaryNumber">0 L</span></div>
+  <p class="summary-equiv reveal" id="summaryEquiv">Complete as atividades acima para ver o total.</p>
+  <div class="summary-bar reveal"><div class="summary-bar-fill" id="summaryBarFill"></div></div>
+  <div class="summary-bar-label reveal" id="summaryBarLabel">0 de 6 atividades concluídas</div>
+</section>
+
+<!-- =================== TIPS / CONCLUSION =================== -->
+<section class="tips" id="conclusao">
+  <h3 class="reveal">Compromissos para o dia a dia</h3>
+  <p class="lead reveal">Marque os hábitos que você pretende colocar em prática a partir de hoje.</p>
+  <ul class="tip-list reveal">
+    <li class="tip-item"><span class="tip-check"></span><span class="tip-text">Fechar o registro ao ensaboar as mãos ou escovar os dentes</span></li>
+    <li class="tip-item"><span class="tip-check"></span><span class="tip-text">Consertar vazamentos assim que percebidos, mesmo pequenos</span></li>
+    <li class="tip-item"><span class="tip-check"></span><span class="tip-text">Trocar a mangueira pela vassoura na limpeza de calçadas</span></li>
+    <li class="tip-item"><span class="tip-check"></span><span class="tip-text">Reduzir o tempo de banho e fechar o registro ao se ensaboar</span></li>
+    <li class="tip-item"><span class="tip-check"></span><span class="tip-text">Verificar reservatórios e caixas d'água contra transbordamento</span></li>
+  </ul>
+  <div class="tip-counter" id="tipsCounter">0 de 5 compromissos assumidos</div>
+</section>
+
+<footer>
+  <div class="f-brand">Desperdício <span>de Água</span></div>
+  <div class="f-names">Heto · Dino · Jão · Vini</div>
+  <div class="f-note">Projeto educativo sobre consumo consciente de água — estimativas usadas para fins ilustrativos.</div>
+</footer>
+
+<div class="float-counter" id="floatCounter">
+  água economizada nesta visita
+  <b id="floatValue">0 L</b>
+</div>
+
+<script>
+/* ============ SCROLL PROGRESS ============ */
+const scrollbar = document.getElementById('scrollbar');
+function updateScrollbar(){
+  const h = document.documentElement;
+  const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  scrollbar.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateScrollbar);
+updateScrollbar();
+
+/* ============ SCROLL REVEAL ============ */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, {threshold:0.15});
+revealEls.forEach(el => io.observe(el));
+
+/* ============ COVER ============ */
+document.getElementById('btnEnter').addEventListener('click', () => {
+  document.getElementById('cover').classList.add('hidden');
+});
+
+/* ============ GLOBAL STATE ============ */
+let missionsCompleted = 0;
+const TOTAL_MISSIONS = 6;
+let litersSaved = 0;
+const floatCounter = document.getElementById('floatCounter');
+const floatValue = document.getElementById('floatValue');
+
+function completeMission(liters){
+  missionsCompleted++;
+  litersSaved += liters;
+  floatValue.textContent = Math.round(litersSaved) + ' L';
+  floatCounter.classList.add('show');
+  updateSummary();
+}
+
+function updateSummary(){
+  const total = Math.round(litersSaved);
+  document.getElementById('summaryNumber').textContent = total + ' L';
+  const pct = Math.round((missionsCompleted / TOTAL_MISSIONS) * 100);
+  document.getElementById('summaryBarFill').style.width = pct + '%';
+  document.getElementById('summaryBarLabel').textContent = missionsCompleted + ' de ' + TOTAL_MISSIONS + ' atividades concluídas';
+  if(missionsCompleted >= TOTAL_MISSIONS){
+    const banhos = Math.max(1, Math.round(total / 45));
+    const garrafas = Math.max(1, Math.round(total / 2));
+    document.getElementById('summaryEquiv').textContent =
+      'Isso equivale a aproximadamente ' + banhos + ' banhos de 5 minutos, ou ' + garrafas + ' garrafas de 2 litros, que deixaram de ser desperdiçados.';
+  } else if(missionsCompleted > 0){
+    document.getElementById('summaryEquiv').textContent =
+      'Continue pelas atividades dos três capítulos para concluir o total.';
+  }
+}
+
+/* ============ ACTIVITY 1: FAUCET (drag to close) ============ */
+(function(){
+  const wheel = document.getElementById('valveWheel');
+  const rig = document.getElementById('faucetRig');
+  const valueEl = document.getElementById('faucetValue');
+  const msgEl = document.getElementById('faucetMsg');
+  const REQUIRED = 320;
+  let dragging = false, startAngle = 0, currentRotation = 0, cumulative = 0, done = false;
+
+  function angleAt(e){
+    const rect = wheel.getBoundingClientRect();
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    return Math.atan2(e.clientY - cy, e.clientX - cx) * 180/Math.PI;
+  }
+
+  wheel.addEventListener('pointerdown', (e) => {
+    if(done) return;
+    dragging = true;
+    wheel.setPointerCapture(e.pointerId);
+    startAngle = angleAt(e);
+  });
+  wheel.addEventListener('pointermove', (e) => {
+    if(!dragging || done) return;
+    const angle = angleAt(e);
+    let delta = angle - startAngle;
+    if(delta > 180) delta -= 360;
+    if(delta < -180) delta += 360;
+    startAngle = angle;
+    currentRotation += delta;
+    if(delta > 0) cumulative += delta;
+    wheel.style.transform = 'rotate(' + currentRotation + 'deg)';
+    const pct = Math.min(1, cumulative / REQUIRED);
+    const flow = Math.max(0, Math.round(46 * (1 - pct)));
+    valueEl.textContent = flow + ' L/dia';
+    if(pct >= 1){
+      done = true;
+      rig.classList.add('closed');
+      valueEl.textContent = '0 L/dia';
+      valueEl.classList.add('ok');
+      msgEl.textContent = 'Registro fechado — vazamento contido.';
+      msgEl.classList.add('ok');
+      completeMission(46);
+    }
+  });
+  wheel.addEventListener('pointerup', (e) => { dragging = false; try{wheel.releasePointerCapture(e.pointerId);}catch(err){} });
+  wheel.addEventListener('pointercancel', () => { dragging = false; });
+})();
+
+/* ============ ACTIVITY 2: PIPE LEAKS ============ */
+(function(){
+  const spots = document.querySelectorAll('#cardPipe .leak-spot');
+  const valueEl = document.getElementById('pipeValue');
+  const msgEl = document.getElementById('pipeMsg');
+  let patched = 0;
+  spots.forEach(spot => {
+    spot.addEventListener('click', () => {
+      if(spot.classList.contains('patched')) return;
+      spot.classList.add('patched');
+      patched++;
+      valueEl.textContent = (spots.length - patched) + ' ponto(s)';
+      if(patched >= spots.length){
+        valueEl.textContent = 'vedado';
+        valueEl.classList.add('ok');
+        msgEl.textContent = 'Todos os furos vedados — tubulação segura.';
+        msgEl.classList.add('ok');
+        completeMission(45);
+      }
+    });
+  });
+})();
+
+/* ============ ACTIVITY 3: CAR WASH (phase stepper) ============ */
+(function(){
+  const toggle = document.getElementById('carHoseToggle');
+  const stateLabel = document.getElementById('carHoseState');
+  const nextBtn = document.getElementById('carNextBtn');
+  const phaseLabel = document.getElementById('carPhaseLabel');
+  const dots = document.querySelectorAll('#cardCar .phase-dot');
+  const valueEl = document.getElementById('carValue');
+  const msgEl = document.getElementById('carMsg');
+
+  const phases = ['Molhar', 'Ensaboar', 'Enxaguar'];
+  let step = 0;
+  let hoseOn = false;
+  let waste = 0;
+  let done = false;
+  let interval = setInterval(() => {
+    if(done) return;
+    if(step === 1 && hoseOn){
+      waste += 1.4;
+      valueEl.textContent = Math.round(waste) + ' L';
+      msgEl.textContent = 'A mangueira não precisa ficar aberta enquanto você ensaboa.';
+      msgEl.classList.add('warn');
+    }
+  }, 300);
+
+  toggle.addEventListener('click', () => {
+    if(done) return;
+    hoseOn = !hoseOn;
+    toggle.classList.toggle('on', hoseOn);
+    stateLabel.textContent = hoseOn ? 'aberta' : 'fechada';
+    if(!(step === 1 && hoseOn)){
+      msgEl.classList.remove('warn');
+      if(!done) msgEl.textContent = '';
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if(done) return;
+    step++;
+    if(step >= phases.length){
+      done = true;
+      clearInterval(interval);
+      nextBtn.disabled = true;
+      phaseLabel.textContent = 'Lavagem concluída';
+      dots.forEach(d => d.classList.add('done'));
+      valueEl.classList.add(waste === 0 ? 'ok' : '');
+      msgEl.classList.remove('warn');
+      if(waste === 0){
+        msgEl.textContent = 'Nenhum desperdício — a mangueira ficou fechada na hora certa.';
+        msgEl.classList.add('ok');
+      } else {
+        msgEl.textContent = 'Quase lá — da próxima vez, feche a mangueira ao ensaboar.';
+      }
+      const saved = Math.max(20, Math.round(80 - waste));
+      completeMission(saved);
+      return;
+    }
+    phaseLabel.textContent = 'Etapa ' + (step+1) + ' de 3 — ' + phases[step];
+    dots.forEach((d,i) => {
+      d.classList.toggle('active', i === step);
+      d.classList.toggle('done', i < step);
+    });
+  });
+})();
+
+/* ============ ACTIVITY 4: DISHES (phase stepper) ============ */
+(function(){
+  const toggle = document.getElementById('dishTapToggle');
+  const stateLabel = document.getElementById('dishTapState');
+  const nextBtn = document.getElementById('dishNextBtn');
+  const phaseLabel = document.getElementById('dishPhaseLabel');
+  const dots = document.querySelectorAll('#cardDishes .phase-dot');
+  const valueEl = document.getElementById('dishValue');
+  const msgEl = document.getElementById('dishMsg');
+
+  const phases = ['Esfregar', 'Enxaguar'];
+  let step = 0;
+  let tapOn = false;
+  let waste = 0;
+  let done = false;
+  let interval = setInterval(() => {
+    if(done) return;
+    if(step === 0 && tapOn){
+      waste += 1.1;
+      valueEl.textContent = Math.round(waste) + ' L';
+      msgEl.textContent = 'Feche a torneira enquanto esfrega — abra só para enxaguar.';
+      msgEl.classList.add('warn');
+    }
+  }, 300);
+
+  toggle.addEventListener('click', () => {
+    if(done) return;
+    tapOn = !tapOn;
+    toggle.classList.toggle('on', tapOn);
+    stateLabel.textContent = tapOn ? 'aberta' : 'fechada';
+    if(!(step === 0 && tapOn)){
+      msgEl.classList.remove('warn');
+      if(!done) msgEl.textContent = '';
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if(done) return;
+    step++;
+    if(step >= phases.length){
+      done = true;
+      clearInterval(interval);
+      nextBtn.disabled = true;
+      phaseLabel.textContent = 'Louça lavada';
+      dots.forEach(d => d.classList.add('done'));
+      msgEl.classList.remove('warn');
+      if(waste === 0){
+        msgEl.textContent = 'Perfeito — torneira fechada durante toda a esfregação.';
+        msgEl.classList.add('ok');
+      } else {
+        msgEl.textContent = 'Quase lá — feche a torneira enquanto esfrega da próxima vez.';
+      }
+      const saved = Math.max(15, Math.round(35 - waste));
+      completeMission(saved);
+      return;
+    }
+    phaseLabel.textContent = 'Etapa ' + (step+1) + ' de 2 — ' + phases[step];
+    dots.forEach((d,i) => {
+      d.classList.toggle('active', i === step);
+      d.classList.toggle('done', i < step);
+    });
+  });
+})();
+
+/* ============ ACTIVITY 5: SHOWER ============ */
+(function(){
+  const rig = document.getElementById('showerRig');
+  const btn = document.getElementById('showerBtn');
+  const valueEl = document.getElementById('showerValue');
+  const msgEl = document.getElementById('showerMsg');
+  let wasted = 0;
+  let done = false;
+  let interval = setInterval(() => {
+    if(done) return;
+    wasted += 0.15;
+    valueEl.textContent = wasted.toFixed(1) + ' L';
+  }, 100);
+
+  btn.addEventListener('click', () => {
+    if(done) return;
+    done = true;
+    clearInterval(interval);
+    rig.classList.add('off');
+    btn.disabled = true;
+    valueEl.textContent = wasted.toFixed(1) + ' L usados';
+    valueEl.classList.add('ok');
+    msgEl.textContent = 'Chuveiro desligado a tempo.';
+    msgEl.classList.add('ok');
+    const saved = Math.max(15, Math.round(90 - wasted));
+    completeMission(saved);
+  });
+})();
+
+/* ============ ACTIVITY 6: TANK (wavy level) ============ */
+(function(){
+  const box = document.getElementById('tankBox');
+  const path = document.getElementById('tankWavePath');
+  const btn = document.getElementById('tankBtn');
+  const valueEl = document.getElementById('tankValue');
+  const msgEl = document.getElementById('tankMsg');
+  let level = 15;
+  let done = false;
+  let t = 0;
+  const W = 88, H = 140;
+
+  function drawWave(){
+    const levelY = H - (level/100)*H;
+    let d = 'M0 ' + levelY;
+    for(let x = 0; x <= W; x += 8){
+      const y = levelY + Math.sin((x/W)*Math.PI*2 + t) * 2.4;
+      d += ' L' + x + ' ' + y;
+    }
+    d += ' L' + W + ' ' + H + ' L0 ' + H + ' Z';
+    path.setAttribute('d', d);
+  }
+
+  let raf;
+  function animate(){
+    t += 0.05;
+    drawWave();
+    raf = requestAnimationFrame(animate);
+  }
+  animate();
+
+  let interval;
+  function tick(){
+    if(done) return;
+    level += 0.7;
+    if(level >= 80) box.classList.add('danger');
+    if(level >= 100){
+      level = 100;
+      valueEl.textContent = 'transbordou!';
+      box.classList.add('overflow');
+      msgEl.textContent = 'O reservatório transbordou — tente fechar o registro mais cedo.';
+      msgEl.classList.add('warn');
+      clearInterval(interval);
+      setTimeout(() => {
+        level = 15;
+        box.classList.remove('overflow','danger');
+        valueEl.textContent = '15%';
+        msgEl.textContent = '';
+        msgEl.classList.remove('warn');
+        interval = setInterval(tick, 200);
+      }, 1500);
+      return;
+    }
+    valueEl.textContent = Math.round(level) + '%';
+  }
+  interval = setInterval(tick, 200);
+
+  btn.addEventListener('click', () => {
+    if(done) return;
+    done = true;
+    clearInterval(interval);
+    box.classList.remove('danger');
+    btn.disabled = true;
+    valueEl.textContent = 'fechado';
+    valueEl.classList.add('ok');
+    msgEl.textContent = 'Registro fechado a tempo — nada foi perdido.';
+    msgEl.classList.add('ok');
+    const saved = Math.max(50, Math.round((100 - level) * 5));
+    completeMission(saved);
+  });
+})();
+
+/* ============ TIPS CHECKLIST ============ */
+(function(){
+  const items = document.querySelectorAll('.tip-item');
+  const counter = document.getElementById('tipsCounter');
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('done');
+      const doneCount = document.querySelectorAll('.tip-item.done').length;
+      counter.textContent = doneCount + ' de ' + items.length + ' compromissos assumidos';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
